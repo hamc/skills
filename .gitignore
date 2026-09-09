@@ -1,0 +1,15 @@
+# Generated narration. The storyboard.json is the source of record and the
+# audio rebuilds from it — see skills/spec-explainer/SKILL.md.
+**/*.audio/
+
+# Rendered walkthroughs are build output.
+*.html
+
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# skill-creator eval output
+*-workspace/

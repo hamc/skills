@@ -1,0 +1,22 @@
+{
+  "title": "Every visual type, once",
+  "kind": "renderer fixture",
+  "lang": "en-US",
+  "scenes": [
+    { "id": "t", "title": "terminal", "narration": "A terminal scene. It exists to pin the code path that draws one.", "seconds": 5,
+      "visual": { "type": "terminal", "file": "$ run", "lines": [{ "text": "PASS", "tone": "good" }, "plain line"] } },
+    { "id": "c", "title": "code", "narration": "A code scene, with one highlighted line.", "seconds": 5,
+      "visual": { "type": "code", "file": "src/x.ts", "lines": ["const a = 1;", "const b = 2;"], "highlight": [2] } },
+    { "id": "p", "title": "compare", "narration": "A compare scene, with equal line counts on both sides.", "seconds": 5,
+      "visual": { "type": "compare", "before": { "label": "today", "lines": ["one", "two"] }, "after": { "label": "proposed", "lines": ["three", "four"] } } },
+    { "id": "f", "title": "flow", "narration": "A flow scene, including a blocked edge and a labelled one.", "seconds": 5,
+      "visual": { "type": "flow",
+        "nodes": [{ "label": "a", "note": "start" }, { "label": "b" }, { "label": "c", "state": "bad" }],
+        "edges": [{ "label": "passes" }, { "label": "never arrives", "state": "blocked" }] } },
+    { "id": "s", "title": "sequence", "narration": "A sequence scene, with a self-message and a caption.", "seconds": 5,
+      "visual": { "type": "sequence", "caption": "Two actors and three messages", "actors": ["one", "two"],
+        "messages": [{ "from": 0, "to": 1, "label": "ask", "state": "ok" }, { "from": 1, "to": 1, "label": "think" }, { "from": 1, "to": 0, "label": "answer", "state": "good" }] } },
+    { "id": "b", "title": "bullets", "narration": "A bullets scene, which closes the fixture.", "seconds": 5,
+      "visual": { "type": "bullets", "items": ["first", "second"] } }
+  ]
+}

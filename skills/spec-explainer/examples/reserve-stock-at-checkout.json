@@ -1,0 +1,138 @@
+{
+  "title": "Reservar o estoque no checkout, não depois do pagamento",
+  "kind": "openspec change",
+  "lang": "pt-BR",
+  "source": "openspec/changes/2026-08-20-reserve-stock-at-checkout",
+  "scenes": [
+    {
+      "id": "problema",
+      "title": "Duas pessoas compraram a última unidade",
+      "narration": "Duas pessoas compraram a última unidade no mesmo minuto. As duas foram cobradas, as duas receberam confirmação, e o estoque terminou em menos um. Nenhum erro apareceu no log: o sistema fez exatamente o que o código manda fazer quando dois checkouts leem o estoque ao mesmo tempo.",
+      "visual": {
+        "type": "terminal",
+        "file": "$ python -m shop.orders --replay 19:03",
+        "lines": [
+          { "text": "SKU-4471  \"Caneca esmaltada\"   estoque: 1", "tone": "muted" },
+          { "text": "19:03:11  pedido #8821  checkout  -> cobrado  R$ 79,00", "tone": "good" },
+          { "text": "19:03:11  pedido #8822  checkout  -> cobrado  R$ 79,00", "tone": "good" },
+          { "text": "" },
+          { "text": "SKU-4471  estoque final: -1", "tone": "bad" },
+          { "text": "0 erros, 0 avisos", "tone": "muted" }
+        ]
+      }
+    },
+    {
+      "id": "impacto",
+      "title": "A conta chega três dias depois, no depósito",
+      "narration": "O prejuízo não aparece no checkout, aparece três dias depois, na separação do pedido. Alguém no depósito descobre que não há o que enviar, e o time de suporte cancela uma compra que o cliente já considera feita. O custo é confiança, e ele chega tarde demais para ser barato.",
+      "visual": {
+        "type": "flow",
+        "nodes": [
+          { "label": "carrinho", "note": "estoque só é olhado" },
+          { "label": "pagamento", "note": "cobra o cartão" },
+          { "label": "baixa de estoque", "note": "pode ir a -1", "state": "bad" },
+          { "label": "separação", "note": "3 dias depois", "state": "bad" }
+        ],
+        "edges": [
+          { "label": "segundos" },
+          { "label": "sem trava" },
+          { "label": "não há o que enviar", "state": "blocked" }
+        ]
+      }
+    },
+    {
+      "id": "causa",
+      "title": "A causa é o intervalo entre duas linhas",
+      "narration": "A causa é o intervalo entre duas linhas. O código lê o estoque, cobra o cartão, e só depois escreve o novo estoque. Entre a leitura e a escrita cabe outro checkout inteiro, e cobrar leva segundos, não milissegundos. Nada nesse trecho impede que os dois passem.",
+      "visual": {
+        "type": "code",
+        "file": "src/cart.py",
+        "lines": [
+          "def checkout(cart, payment):",
+          "    for item in cart.items:",
+          "        if stock_of(item.sku) < item.qty:",
+          "            raise OutOfStock(item.sku)",
+          "    charge(payment, cart.total)",
+          "    for item in cart.items:",
+          "        decrement_stock(item.sku, item.qty)"
+        ],
+        "highlight": [3, 7]
+      }
+    },
+    {
+      "id": "regra",
+      "title": "A regra: reservar antes de cobrar",
+      "narration": "A proposta move a baixa de estoque para antes da cobrança, e a torna condicional. Reservar é uma única escrita atômica que só tem sucesso se ainda houver saldo. Quem reservou cobra; quem não reservou recebe a mensagem de esgotado antes de ver o formulário de pagamento.",
+      "visual": {
+        "type": "compare",
+        "before": {
+          "label": "hoje",
+          "lines": [
+            "Lê o estoque, cobra, depois escreve",
+            "Duas leituras simultâneas veem o mesmo saldo",
+            "A venda a mais aparece na separação",
+            "Cancelamento manual, dias depois"
+          ]
+        },
+        "after": {
+          "label": "proposta",
+          "lines": [
+            "Reserva primeiro, cobra depois",
+            "A reserva é condicional: só uma vence",
+            "O esgotado aparece antes do pagamento",
+            "Nada para cancelar"
+          ]
+        }
+      }
+    },
+    {
+      "id": "decisao",
+      "title": "E quem desiste no meio do caminho?",
+      "narration": "A decisão em que a mudança vive ou morre é o carrinho abandonado. Uma reserva que nunca expira transforma cada desistência em estoque perdido. Por isso ela vale quinze minutos, e o próprio pedido de reserva grava o prazo: ninguém precisa lembrar de devolver a peça.",
+      "visual": {
+        "type": "sequence",
+        "caption": "A reserva expira sozinha, então desistir não custa estoque",
+        "actors": ["cliente", "checkout", "estoque"],
+        "messages": [
+          { "from": 0, "to": 1, "label": "finalizar compra", "state": "ok" },
+          { "from": 1, "to": 2, "label": "reserva 1 un. por 15 min", "state": "ok" },
+          { "from": 2, "to": 1, "label": "ok — saldo agora 0", "state": "good" },
+          { "from": 0, "to": 1, "label": "fecha a aba", "state": "bad" },
+          { "from": 2, "to": 2, "label": "prazo vence, saldo volta a 1", "state": "good" }
+        ]
+      }
+    },
+    {
+      "id": "naogoals",
+      "title": "O que esta mudança não faz",
+      "narration": "O escopo é estreito de propósito. Nada de backorder, nada de fila de espera, nada de serviço novo de inventário. A reserva usa a tabela que já existe e uma coluna a mais. Quanto menor a mudança, mais fácil defender que ela não quebrou o checkout.",
+      "visual": {
+        "type": "bullets",
+        "items": [
+          "Sem backorder: esgotado continua sendo esgotado",
+          "Sem fila de espera nem aviso de volta ao estoque",
+          "Nenhum serviço novo — a reserva mora na tabela de estoque",
+          "Preço, frete e cupom não são tocados"
+        ]
+      }
+    },
+    {
+      "id": "evidencia",
+      "title": "O que a verificação mostrou, e o que não mostrou",
+      "narration": "A verificação tem duas partes. Os testes unitários provam a regra, e um teste de concorrência dispara cinquenta checkouts simultâneos contra uma unidade: exatamente um passa. O que ele não prova é o comportamento sob falha do banco no meio da reserva, e isso ficou registrado como risco em aberto.",
+      "visual": {
+        "type": "terminal",
+        "file": "$ pytest -q tests/test_checkout.py",
+        "lines": [
+          { "text": "test_a_ultima_unidade_vai_para_um_comprador     PASSED", "tone": "good" },
+          { "text": "test_reserva_expira_em_15_min                   PASSED", "tone": "good" },
+          { "text": "test_cinquenta_checkouts_simultaneos            PASSED", "tone": "good" },
+          { "text": "    -> 1 pago, 49 esgotado, estoque final 0", "tone": "cool" },
+          { "text": "" },
+          { "text": "128 passed in 3.41s", "tone": "muted" },
+          { "text": "em aberto: queda do banco entre reserva e cobrança", "tone": "bad" }
+        ]
+      }
+    }
+  ]
+}

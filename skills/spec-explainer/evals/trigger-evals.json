@@ -1,0 +1,23 @@
+[
+  {"query": "I just opened openspec/changes/refuse-an-inverted-routes-map and the design doc alone is 18 KB. Whole team has to review it today and nobody is going to read it. help", "should_trigger": true},
+  {"query": "can you make a video explaining the 001-idempotent-payments proposal for the backend folks", "should_trigger": true},
+  {"query": "we've got specs/003-webhook-retries/ here (spec-kit). I have to present it at the architecture review tomorrow morning — anything visual we could put together?", "should_trigger": true},
+  {"query": "Rafael says he hasn't had time to read the rate limiting RFC and it's the third sprint it's been sitting there waiting on his review", "should_trigger": true},
+  {"query": "a junior dev started yesterday and the first PR she's reviewing is the agentic executor change. she doesn't know the codebase at all yet", "should_trigger": true},
+  {"query": "walkthrough of change 2026-08-30-agent-skill-install pls", "should_trigger": true},
+  {"query": "I need to explain this spec to 4 people in different timezones without setting up a call", "should_trigger": true},
+  {"query": "this proposal has 9 design decisions and I cannot get anyone to follow the argument all the way through. ideas?", "should_trigger": true},
+  {"query": "grava um vídeo explicando openspec/changes/deterministic-verdicts pro time, nível iniciante", "should_trigger": true},
+  {"query": "können wir specs/004-billing-migration irgendwie so aufbereiten, dass das Team es anschaut statt liest?", "should_trigger": true},
+
+  {"query": "I want to create a new openspec proposal for adding webhook support to checkout, with a design.md and tasks", "should_trigger": false},
+  {"query": "implement the remaining tasks in openspec/changes/route-drift-warning, there are 6 still unchecked", "should_trigger": false},
+  {"query": "review spec 002-payment-retries and tell me whether its argument holds up — I don't think the rejected alternative was really ruled out", "should_trigger": false},
+  {"query": "record a screencast of the app running the checkout flow so I can attach it to the PR", "should_trigger": false},
+  {"query": "explain what src/cart.py:211 is doing, I don't follow the retry loop", "should_trigger": false},
+  {"query": "I need a text-to-speech thing that reads this changelog out loud so I can listen to it in the car", "should_trigger": false},
+  {"query": "build me a dashboard showing how many openspec changes got archived per month over the last 6 months", "should_trigger": false},
+  {"query": "archive the reserve-stock-at-checkout change, it's been implemented and merged", "should_trigger": false},
+  {"query": "turn this conversation we just had into an architecture decision record for the repo", "should_trigger": false},
+  {"query": "write a markdown summary of this PR's diff for the description, 3 paragraphs or so", "should_trigger": false}
+]

@@ -1,0 +1,33 @@
+{
+  "skill_name": "spec-explainer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "named-change-in-the-team-language",
+      "prompt": "explica a proposta reserve-stock-at-checkout pro time",
+      "expected_output": "A walkthrough of that change. The language is asked or read from .spec-explainer/config.json rather than inferred from the spec, which is English. Six to eight scenes under two minutes, opening on the concrete failure, with everything written under .spec-explainer/ and nothing committed.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "no-change-named",
+      "prompt": "make a video of the current change",
+      "expected_output": "The skill lists what is in flight and asks which change, rather than guessing or defaulting to the most recent. It does not begin writing a storyboard before the change and the language are both settled.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "different-framework",
+      "prompt": "walk me through specs/003-payment-retries",
+      "expected_output": "Recognised as spec-kit rather than OpenSpec: the argument is read from spec.md, the decisions from plan.md and research.md, the verification from tasks.md. If plan.md carries no rejected alternative, the skill says the walkthrough will be thin and offers fewer scenes instead of padding to seven.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "landed-change-quoting-fixed-code",
+      "prompt": "grava um walkthrough do browser-patience, que já foi mergeado",
+      "expected_output": "Any code scene quotes the source as it was before the change landed, retrieved with git show <commit>^:<path>, not the current file which already contains the fix and not a reconstruction from the design's prose.",
+      "files": []
+    }
+  ]
+}
